@@ -1,4 +1,5 @@
 <?php 
+session_start();
 
 require 'config/db.php';
 
@@ -14,7 +15,7 @@ $comando = $con->query("SELECT id, nombre, email, sexo,
     WHEN area_id = 6 THEN 'Proyectos'
     WHEN area_id = 7 THEN 'Servicios'
     WHEN area_id = 8 THEN 'Calidad'
-    END as area_id, 
+    END as area_id_n, area_id,
     CASE
     WHEN boletin = 1 THEN 'Si'
     WHEN boletin = 0 THEN 'No'
@@ -34,7 +35,7 @@ $res_areas = $areas->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Website with a contact Form 01</title>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="Public/css/main.css">
     <!-- GOOGLE FONTs -->
     <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
     <!-- FONT AWESOME -->
@@ -42,7 +43,7 @@ $res_areas = $areas->fetchAll(PDO::FETCH_ASSOC);
     <!-- ANIMATE CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </head>
 <script type="text/javascript">
 $(document).ready(function(){  
@@ -50,6 +51,15 @@ $(document).ready(function(){
         $('.modificar').hide("slow");
         $('.modificar').show("slow");
         $('.crear').hide("slow");
+        $('.eliminar').hide("slow");
+    });
+});
+$(document).ready(function(){  
+    $(".botoneliminar").click(function () {
+        $('.eliminar').hide("slow");
+        $('.eliminar').show("slow");
+        $('.crear').hide("slow");
+        $('.modificar').hide("slow");
     });
 });
 
@@ -57,7 +67,7 @@ $(document).ready(function(){
     $(".creare").click(function () {
         $('.crear').toggle("slow");
         $('.modificar').hide("slow");
-
+        $('.eliminar').hide("slow");
     });
 });
 
@@ -67,13 +77,21 @@ $(document).ready(function() {
         var nombre = $('#nombre' + id).text();
         var correo = $('#correo' + id).text();
         var sexo = $('#sexo' + id).text();
+        var areaid = $('#areaid' + id).text();
         var area = $('#area' + id).text();
         var boletin = $('#boletin' + id).text();
-       
+        var descripcion = $('#descripcion' + id).text();
+
+        $('#id').val(id);
         $('#nombre').val(nombre);
         $('#correo').val(correo);
-        $('#earea').val(area);
-        $('#eboletin').val(boletin);
+        $('#earea').val(areaid);
+        $('#edescripcion').val(descripcion);
+        if(boletin=="Si"){
+            document.querySelector('#eboletin').checked = true;
+        }else{
+             document.querySelector('#eboletin').checked = false;
+        }
         if(sexo=="M"){
             document.querySelector('#esexo1').checked = true;
         }else{
@@ -84,6 +102,20 @@ $(document).ready(function() {
 
     });
 });
+$(document).ready(function() {
+    $(document).on('click', '.botoneliminar', function() {
+        var elid = $(this).val();
+        var elnombre = $('#nombre' + elid).text();
+        var elcorreo = $('#correo' + elid).text();
+        
+        $('#elid').val(elid);
+        $('#elnombre').val(elnombre);
+        $('#elcorreo').val(elcorreo);
+
+    });
+});
+
+
 $(document).ready(function() {
     $(document).on('click', '.delete', function() {
         var id = $(this).val();
@@ -106,12 +138,13 @@ $(document).ready(function() {
 });
 </script>
 <body>
-    <div class="content crear">
+    <div class="content crear " style="display: none;">
         <h1 class="logo">FORMULARIO </h1>
         <div class="contact-wrapper animated bounceInUp">
             <div class="contact-form">
-                <h3>Contact us</h3>
+                <h3>Información del empleado</h3>
                 <form method="POST" action="guarda.php" autocomplete="off">
+
                     <p>
                         <label>Nombre completo</label>
                         <input type="text" name="nombre" required autofocus>
@@ -212,8 +245,12 @@ $(document).ready(function() {
         <h1 class="logo">FORMULARIO MODIFICAR</h1>
         <div class="contact-wrapper animated bounceInUp">
             <div class="contact-form">
-                <h3>Contact us</h3>
+                <h3>Información del empleado</h3>
                 <form method="POST" action="guarda.php" autocomplete="off">
+                    <p style="display: none;">
+                        <label>Id</label>
+                        <input type="text" id="id" name="id" required >
+                    </p>
                     <p>
                         <label>Nombre completo</label>
                         <input type="text" id="nombre" name="nombre" required autofocus>
@@ -250,7 +287,7 @@ $(document).ready(function() {
                       
                     <p class="block">
                        <label>Descripción</label> 
-                        <textarea name="descripcion" rows="3" required></textarea>
+                        <textarea id="edescripcion" name="descripcion" rows="3" required></textarea>
                     </p>  
                     <p>Boletín:</p><br>
                     
@@ -259,8 +296,44 @@ $(document).ready(function() {
                       <label for="eboletin">Desea recibir boletín informativo</label>
                     </p>
                     <p class="block">
-                        <button>
+                        <button name="modificar">
                             Modificar
+                        </button>
+                    </p>
+                </form>
+            </div>
+            <div class="contact-info">
+                <h4>Información</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Marlon Miranda</li>
+                    <li><i class="fas fa-phone"></i> 3173202747</li>
+                    <li><i class="fas fa-envelope-open-text"></i> marlonmira.com</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="content eliminar" style="display: none;" >
+        <h1 class="logo">ELIMINAR EMPLEADO</h1>
+        <div class="contact-wrapper animated bounceInUp">
+            <div class="contact-form">
+                <h3>Información del empleado</h3>
+                <form method="POST" action="guarda.php" autocomplete="off">
+                    <p style="display: none;">
+                        <label>Id</label>
+                        <input type="text" id="elid" name="id" required >
+                    </p>
+                    <p>
+                        <label>Nombre completo</label>
+                        <input type="text" id="elnombre" name="nombre" required >
+                    </p>
+                    <p>
+                        <label>Correo electronico</label>
+                        <input type="email" id="elcorreo" name="correo" required>
+                    </p>
+                    
+                    <p class="block">
+                        <button name="eliminar">
+                            Eliminar
                         </button>
                     </p>
                 </form>
@@ -299,13 +372,18 @@ $(document).ready(function() {
                     foreach($resultado AS $row){ 
                 ?>
                 <tr>
+                        <td style="display: none;"><span id="id<?php echo $row['id'] ?>"><?php echo $row['id'] ?></span></td>
+                        <td style="display: none;"><span id="areaid<?php echo $row['id'] ?>"><?php echo $row['area_id'] ?></span></td>
+                        <td style="display: none;"><span id="descripcion<?php echo $row['id'] ?>"><?php echo $row['descripcion'] ?></span></td>
+
                         <td><span id="nombre<?php echo $row['id'] ?>"><?php echo $row['nombre'] ?></span></td>
                         <td><span id="correo<?php echo $row['id'] ?>"><?php echo $row['email'] ?></span></td>
                         <td><span id="sexo<?php echo $row['id'] ?>"><?php echo $row['sexo'] ?></span></td>
-                        <td><span id="area<?php echo $row['id'] ?>"><?php echo $row['area_id'] ?></span></td>
+
+                        <td><span id="area<?php echo $row['id'] ?>"><?php echo $row['area_id_n'] ?></span></td>
                         <td><span id="boletin<?php echo $row['id'] ?>"><?php echo $row['boletin'] ?></span></td>
-                        <td><center><input value="<?php echo $row['id'] ?>" type="image" class="botonmoodificar" src="img/boton.png"  height="40" width="40"/></center> </td>
-                        <td> <center><input type="image" id="eliminar" src="img/boton.png"  height="40" width="40"/></center> </td>
+                        <td><center><input value="<?php echo $row['id'] ?>" type="image" class="botonmoodificar" src="img/modi.png"  height="40" width="40"/></center> </td>
+                        <td><center><input value="<?php echo $row['id'] ?>" type="image" class="botoneliminar" src="img/eliminar.png"  height="40" width="40"/></center> </td>
                 </tr>
                 <?php } ?>
                 
@@ -313,5 +391,10 @@ $(document).ready(function() {
             </table>     
         </div>
     </div>
+    <?php if (isset($_SESSION['exito'])) { ?>
+            <script type="text/javascript">
+                swal("<?php echo $_SESSION['exito'] ?>","", "success");
+            </script>
+    <?php $_SESSION['exito'] = null;} ?>
 </body>
 </html>

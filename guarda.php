@@ -1,5 +1,5 @@
 <?php 
-
+session_start();
 require 'config/db.php';
 
 $db = new Database();
@@ -7,16 +7,26 @@ $db = new Database();
 $con = $db->conectar();
 
 
+if(isset($_POST['eliminar'])){
+
+	$id = $_POST['id'];
 	
+	$query = $con->prepare("DELETE FROM `empleado` WHERE `id` = '$id'");
+	$query->execute();
+	$_SESSION['exito'] = '¡Empleado Eliminado!';
+	header('location: index.php');
+}
+		
 if(isset($_POST['modificar'])){
 
+	$id = $_POST['id'];
 	$nombre = $_POST['nombre'];
 	$correo = $_POST['correo'];
 	$area = $_POST['area'];
 	$descripcion = $_POST['descripcion'];
 	
-	if(isset($_POST['sexo'])){
-		$sexo = $_POST['sexo'];
+	if(isset($_POST['esexo'])){
+		$sexo = $_POST['esexo'];
 	}else{
 		header('location: form.php');
 	}
@@ -27,21 +37,28 @@ if(isset($_POST['modificar'])){
 		$boletin = "0";
 	}
 	
-
-	header('location: form.php');
+	$query = $con->prepare("UPDATE `empleado`
+		SET
+		`nombre` = '$nombre',
+		`email` = '$correo',
+		`sexo` = '$sexo',
+		`area_id` = '$area',
+		`boletin` = '$boletin',
+		`descripcion` = '$descripcion'
+		WHERE `id` = '$id';
+		");
+	$query->execute();
+	$_SESSION['exito'] = '¡Empleado Modificado!';
+	header('location: index.php');
 }
+	
 	
 if(isset($_POST['crear'])){
 	$nombre = $_POST['nombre'];
 	$correo = $_POST['correo'];
 	$area = $_POST['area'];
 	$descripcion = $_POST['descripcion'];
-	
-	if(isset($_POST['sexo'])){
-		$sexo = $_POST['sexo'];
-	}else{
-		header('location: form.php');
-	}
+	$sexo = $_POST['sexo'];
 
 	if(isset($_POST['boletin'])){
 		$boletin = $_POST['boletin'];
@@ -93,7 +110,7 @@ if(isset($_POST['crear'])){
 	
 	
 
-
-	header('location: form.php');
+	$_SESSION['exito'] = '¡Nuevo empleado registrado!';
+	header('location: index.php');
 }
 ?>
