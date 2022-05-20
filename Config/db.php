@@ -3,10 +3,10 @@
 class Database
 {
 	
-	private $hostname = "localhost";
+	private $hostname = "mirandamar.mysql.database.azure.com";
 	private $database = "prueba_tecnica_dev";
-	private $user = "root";
-	private $password = "";
+	private $user = "marlon@mirandamar";
+	private $password = "Platino5";
 	private $charset = "utf8";
 
 	function conectar(){
